@@ -1,50 +1,26 @@
-let tappedCount = 0;
+document.getElementById("start").addEventListener("click", async () => {
 
-// タップで動物消す
-AFRAME.registerComponent('clickable', {
-  init: function () {
-    this.el.addEventListener('click', () => {
+  const scene = document.querySelector("a-scene");
 
-      if (this.el.getAttribute("visible") === false) return;
-
-      this.el.setAttribute("visible", false);
-      tappedCount++;
-
-      if (tappedCount === 3) {
-        document.querySelector("#infoCard")
-          .setAttribute("visible", true);
-      }
+  // scene読み込み待つ
+  if (!scene.hasLoaded) {
+    await new Promise(resolve => {
+      scene.addEventListener("loaded", resolve);
     });
   }
-});
 
-// 画面タップでカメラ起動（超重要）
-const overlay = document.getElementById("overlay");
-
-overlay.addEventListener("click", async () => {
-  const sceneEl = document.querySelector("a-scene");
+  // mindar準備待つ
+  let mindar;
+  while (!mindar) {
+    mindar = scene.systems["mindar-image-system"];
+    await new Promise(r => setTimeout(r, 100));
+  }
 
   try {
-    await sceneEl.systems["mindar-image-system"].start();
-    overlay.style.display = "none"; // オーバーレイ消す
+    await mindar.start();
+    document.getElementById("start").style.display = "none";
   } catch (e) {
-    alert("カメラ起動エラー: " + e);
+    alert("カメラ起動できない：" + e);
   }
+
 }, { once: true });
-
-// リセット
-const resetBtn = document.getElementById("resetBtn");
-
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-
-    tappedCount = 0;
-
-    document.querySelectorAll(".animal").forEach(el => {
-      el.setAttribute("visible", true);
-    });
-
-    document.querySelector("#infoCard")
-      .setAttribute("visible", false);
-  });
-}
