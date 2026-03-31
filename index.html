@@ -1,59 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <!-- MindAR -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-aframe.prod.js"></script>
 </head>
 
 <body>
-  <a-scene 
-  mindar-image="imageTargetSrc: targets.mind; autoStart: false"
-  embedded
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
->
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <!-- ARシーン -->
+  <a-scene
+    mindar-image="imageTargetSrc: targets.mind; autoStart: false"
+    embedded
+    color-space="sRGB"
+    renderer="colorManagement: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <!-- カメラ -->
+    <a-camera 
+      position="0 0 0"
+      look-controls="enabled: false"
+      cursor="rayOrigin: mouse">
+    </a-camera>
 
     <!-- マーカー -->
     <a-entity mindar-image-target="targetIndex: 0">
 
-      <!-- 動物1 -->
-      <a-image src="catfish1.png"
-        position="-0.5 0 0"
-        class="animal clickable"></a-image>
-
-      <!-- 動物2 -->
-      <a-image src="catfish2.png"
-        position="0.5 0 0"
-        class="animal clickable"></a-image>
-
-      <!-- 動物3 -->
-      <a-image src="catfish3.png"
-        position="0 0.5 0"
-        class="animal clickable"></a-image>
+      <!-- ナマズ3体 -->
+      <a-image src="catfish1.png" position="-0.5 0 0" class="animal clickable"></a-image>
+      <a-image src="catfish2.png" position="0.5 0 0" class="animal clickable"></a-image>
+      <a-image src="catfish3.png" position="0 0.5 0" class="animal clickable"></a-image>
 
       <!-- 説明カード -->
       <a-image id="infoCard"
         src="catfish.png"
         position="0 -0.5 0"
-        visible="false"></a-image>
+        visible="false">
+      </a-image>
 
     </a-entity>
 
   </a-scene>
 
-<button id="startBtn" style="
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  font-size: 18px;
-">
-開始
-</button>
+  <!-- タップ誘導（iPhone対策） -->
+  <div id="overlay" style="
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    z-index:999;
+  ">
+    画面をタップしてスタート
+  </div>
+
+  <!-- 終了ボタン -->
+  <button id="resetBtn" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    font-size: 18px;
+    z-index: 1000;
+  ">
+    終了
+  </button>
 
   <script src="script.js"></script>
+
 </body>
 </html>
