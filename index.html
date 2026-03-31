@@ -1,52 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>AR Animal</title>
 
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-aframe.prod.js"></script>
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+
+  <!-- AR.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+
+    #resetBtn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: white;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
-  <a-scene
-    mindar-image="imageTargetSrc: targets.mind; autoStart: false"
-    embedded
-    vr-mode-ui="enabled: false"
-  >
+<button id="resetBtn">もう一度</button>
 
-    <a-camera cursor="rayOrigin: mouse"></a-camera>
+<a-scene embedded arjs>
+  
+  <!-- マーカー -->
+  <a-marker type="pattern" url="marker.patt">
 
-    <a-entity mindar-image-target="targetIndex: 0">
+    <!-- 動物① -->
+    <a-image src="catfish1.png" position="-1 0 0" class="animal"></a-image>
 
-      <a-image src="catfish1.png" position="-0.5 0 0"></a-image>
-      <a-image src="catfish2.png" position="0.5 0 0"></a-image>
-      <a-image src="catfish3.png" position="0 0.5 0"></a-image>
+    <!-- 動物② -->
+    <a-image src="catfish2.png" position="0 0 0" class="animal"></a-image>
 
-    </a-entity>
+    <!-- 動物③ -->
+    <a-image src="catfish3.png" position="1 0 0" class="animal"></a-image>
 
-  </a-scene>
+    <!-- 説明カード -->
+    <a-plane id="infoCard"
+             position="0 1 0"
+             width="2"
+             height="1"
+             color="white"
+             visible="false">
+    </a-plane>
 
-  <!-- スタート画面 -->
-<div id="start" style="
-  position: fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:22px;
-  z-index:9999;
-  pointer-events: auto;
-">
-  タップしてARスタート
-</div>
+  </a-marker>
 
-  <script src="script.js"></script>
+  <a-entity camera></a-entity>
+</a-scene>
+
+<script>
+let tappedCount = 0;
+const animals = document.querySelectorAll('.animal');
+const card = document.getElementById('infoCard');
+const resetBtn = document.getElementById('resetBtn');
+
+// タップ処理
+animals.forEach(animal => {
+  animal.addEventListener('click', () => {
+    if (animal.getAttribute('visible')) {
+      animal.setAttribute('visible', false);
+      tappedCount++;
+
+      if (tappedCount === 3) {
+        card.setAttribute('visible', true);
+        resetBtn.style.display = "block";
+      }
+    }
+  });
+});
+
+// リセット
+resetBtn.addEventListener('click', () => {
+  tappedCount = 0;
+
+  animals.forEach(animal => {
+    animal.setAttribute('visible', true);
+  });
+
+  card.setAttribute('visible', false);
+  resetBtn.style.display = "none";
+});
+</script>
 
 </body>
 </html>
