@@ -7,11 +7,11 @@
 
 <body>
   <a-scene 
-    mindar-image="imageTargetSrc: targets.mind"
-    embedded
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-  >
+  mindar-image="imageTargetSrc: targets.mind; autoStart: false"
+  embedded
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
@@ -43,15 +43,15 @@
 
   </a-scene>
 
-  <button id="resetBtn" style="
+<button id="startBtn" style="
   position: fixed;
-  bottom: 20px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   padding: 10px 20px;
   font-size: 18px;
 ">
-終了
+開始
 </button>
 
   <script src="script.js"></script>
