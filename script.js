@@ -1,3 +1,5 @@
+alert("JS動いてる");
+
 document.getElementById("start").addEventListener("click", async () => {
 
   const scene = document.querySelector("a-scene");
