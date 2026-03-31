@@ -28,3 +28,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   document.querySelector("#infoCard")
     .setAttribute("visible", false);
 });
+
+document.getElementById("startBtn").addEventListener("click", async () => {
+  const sceneEl = document.querySelector("a-scene");
+  await sceneEl.systems["mindar-image-system"].start();
+});
