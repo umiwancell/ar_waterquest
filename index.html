@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-aframe.prod.js"></script>
+</head>
+
+<body>
+  <a-scene 
+    mindar-image="imageTargetSrc: targets.mind"
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- マーカー -->
+    <a-entity mindar-image-target="targetIndex: 0">
+
+      <!-- 動物1 -->
+      <a-image src="catfish1.png"
+        position="-0.5 0 0"
+        class="animal clickable"></a-image>
+
+      <!-- 動物2 -->
+      <a-image src="catfish2.png"
+        position="0.5 0 0"
+        class="animal clickable"></a-image>
+
+      <!-- 動物3 -->
+      <a-image src="catfish3.png"
+        position="0 0.5 0"
+        class="animal clickable"></a-image>
+
+      <!-- 説明カード -->
+      <a-image id="infoCard"
+        src="catfish.png"
+        position="0 -0.5 0"
+        visible="false"></a-image>
+
+    </a-entity>
+
+  </a-scene>
+
+  <button id="resetBtn" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  font-size: 18px;
+">
+終了
+</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
