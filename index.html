@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="utf-8">
     <title>ナマズAR図鑑</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <style>
+        /* 終了ボタンのスタイル */
+        #exit-button {
+            display: none; 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 999; 
+            padding: 15px 30px; 
+            font-size: 18px; 
+            font-weight: bold;
+            background: #ffde59; 
+            border: 2px solid #000;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -12,33 +31,34 @@
     <script>
         let tappedCount = 0;
 
-        // タップされた時の処理
+        // タップ判定用のコンポーネント登録
         AFRAME.registerComponent('tap-handler', {
             init: function () {
                 this.el.addEventListener('click', () => {
-                    // 要素を消す
+                    // すでに非表示なら無視
+                    if (this.el.getAttribute('visible') === false) return;
+
+                    // タップされたナマズを消す
                     this.el.setAttribute('visible', false);
-                    this.el.setAttribute('class', 'not-clickable'); // クリック判定から外す
-                    
                     tappedCount++;
 
-                    // 3体タップされたら説明カードを表示
+                    // 3体すべて消えたらカードを表示
                     if (tappedCount === 3) {
                         const card = document.querySelector('#info-card');
                         card.setAttribute('visible', true);
+                        // 終了ボタンを表示
                         document.querySelector('#exit-button').style.display = 'block';
                     }
                 });
             }
         });
 
-        // 終了ボタン（リセット）
-        function resetAR() {
+        // リセット機能（もう一度遊ぶ）
+        function resetGame() {
             tappedCount = 0;
-            // 全てのナマズを再表示
-            document.querySelectorAll('.catfish').forEach(el => {
-                el.setAttribute('visible', true);
-                el.setAttribute('class', 'catfish clickable');
+            // ナマズを復活させる
+            document.querySelectorAll('.target-fish').forEach(fish => {
+                fish.setAttribute('visible', true);
             });
             // カードを隠す
             document.querySelector('#info-card').setAttribute('visible', false);
@@ -47,11 +67,13 @@
         }
     </script>
 
-    <button id="exit-button" onclick="resetAR()" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; padding: 10px 20px; font-size: 18px; background: white; border-radius: 10px;">
-        もう一度探す
+    <button id="exit-button" onclick="resetGame()">
+        もういちど探す
     </button>
 
-    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" cursor="fuse: false; rayOrigin: mouse;">
+    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" 
+             cursor="fuse: false; rayOrigin: mouse;"
+             vr-mode-ui="enabled: false">
         
         <a-assets>
             <img id="cat1" src="catfish1.png">
@@ -60,19 +82,28 @@
             <img id="card" src="catfish.png">
         </a-assets>
 
-        <a-marker type="pattern" url="marker.patt">
+        <a-marker preset="marker.patt">
             
-            <a-image src="#cat1" position="-1 0.5 0" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
+            <a-image class="target-fish" src="#cat1" 
+                     position="-0.8 0.5 0" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                     tap-handler></a-image>
             
-            <a-image src="#cat2" position="0 0.5 -1" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
+            <a-image class="target-fish" src="#cat2" 
+                     position="0 0.5 -0.8" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                     tap-handler></a-image>
             
-            <a-image src="#cat3" position="1 0.5 0" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
+            <a-image class="target-fish" src="#cat3" 
+                     position="0.8 0.5 0" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                     tap-handler></a-image>
 
-            <a-image id="info-card" src="#card" position="0 1 0" rotation="-90 0 0" scale="2 2 2" visible="false"></a-image>
+            <a-image id="info-card" src="#card" 
+                     position="0 0.8 0" rotation="-90 0 0" scale="2.5 1.8 1" 
+                     visible="false"></a-image>
 
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
+
 </body>
 </html>
