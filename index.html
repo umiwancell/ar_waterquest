@@ -71,39 +71,40 @@
         もういちど探す
     </button>
 
-    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" 
-             cursor="fuse: false; rayOrigin: mouse;"
-             vr-mode-ui="enabled: false">
+   <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" 
+         cursor="fuse: false; rayOrigin: mouse;"
+         raycaster="objects: .target-fish"
+         vr-mode-ui="enabled: false">
+    
+    <a-assets>
+        <img id="cat1" src="catfish1.png">
+        <img id="cat2" src="catfish2.png">
+        <img id="cat3" src="catfish3.png">
+        <img id="card" src="catfish.png">
+    </a-assets>
+
+    <a-marker preset="hiro">
         
-        <a-assets>
-            <img id="cat1" src="catfish1.png">
-            <img id="cat2" src="catfish2.png">
-            <img id="cat3" src="catfish3.png">
-            <img id="card" src="catfish.png">
-        </a-assets>
+        <a-image id="fish1" class="target-fish" src="#cat1" 
+                 position="-1.2 0.5 0.5" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                 tap-handler></a-image>
+        
+        <a-image id="fish2" class="target-fish" src="#cat2" 
+                 position="0 0.7 -1.2" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                 tap-handler></a-image>
+        
+        <a-image id="fish3" class="target-fish" src="#cat3" 
+                 position="1.2 0.5 0.5" rotation="-90 0 0" scale="0.7 0.7 0.7" 
+                 tap-handler></a-image>
 
-        <a-marker preset="marker.patt">
-            
-            <a-image class="target-fish" src="#cat1" 
-                     position="-0.8 0.5 0" rotation="-90 0 0" scale="0.7 0.7 0.7" 
-                     tap-handler></a-image>
-            
-            <a-image class="target-fish" src="#cat2" 
-                     position="0 0.5 -0.8" rotation="-90 0 0" scale="0.7 0.7 0.7" 
-                     tap-handler></a-image>
-            
-            <a-image class="target-fish" src="#cat3" 
-                     position="0.8 0.5 0" rotation="-90 0 0" scale="0.7 0.7 0.7" 
-                     tap-handler></a-image>
+        <a-image id="info-card" src="#card" 
+                 position="0 1.0 0" rotation="-90 0 0" scale="2.5 1.8 1" 
+                 visible="false"></a-image>
 
-            <a-image id="info-card" src="#card" 
-                     position="0 0.8 0" rotation="-90 0 0" scale="2.5 1.8 1" 
-                     visible="false"></a-image>
+    </a-marker>
 
-        </a-marker>
-
-        <a-entity camera></a-entity>
-    </a-scene>
+    <a-entity camera></a-entity>
+</a-scene>
 
 </body>
 </html>
