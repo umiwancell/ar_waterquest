@@ -1,96 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>AR Animal</title>
-
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-
-  <!-- AR.js -->
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/aframe/build/aframe-ar.js"></script>
-
-  <style>
-    body { margin: 0; overflow: hidden; }
-
-    #resetBtn {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      background: white;
-      border-radius: 10px;
-      display: none;
-    }
-  </style>
+    <meta charset="utf-8">
+    <title>ナマズAR図鑑</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
-<body>
+<body style="margin: 0; overflow: hidden;">
 
-<button id="resetBtn">もう一度</button>
+    <script>
+        let tappedCount = 0;
 
-<a-scene embedded arjs cursor="rayOrigin: mouse">
-  
-  <!-- マーカー -->
-  <a-marker type="pattern" url="marker.patt">
+        // タップされた時の処理
+        AFRAME.registerComponent('tap-handler', {
+            init: function () {
+                this.el.addEventListener('click', () => {
+                    // 要素を消す
+                    this.el.setAttribute('visible', false);
+                    this.el.setAttribute('class', 'not-clickable'); // クリック判定から外す
+                    
+                    tappedCount++;
 
-    <!-- 動物① -->
-    <a-image src="catfish1.png" position="-1 0 0" class="animal"></a-image>
+                    // 3体タップされたら説明カードを表示
+                    if (tappedCount === 3) {
+                        const card = document.querySelector('#info-card');
+                        card.setAttribute('visible', true);
+                        document.querySelector('#exit-button').style.display = 'block';
+                    }
+                });
+            }
+        });
 
-    <!-- 動物② -->
-    <a-image src="catfish2.png" position="0 0 0" class="animal"></a-image>
+        // 終了ボタン（リセット）
+        function resetAR() {
+            tappedCount = 0;
+            // 全てのナマズを再表示
+            document.querySelectorAll('.catfish').forEach(el => {
+                el.setAttribute('visible', true);
+                el.setAttribute('class', 'catfish clickable');
+            });
+            // カードを隠す
+            document.querySelector('#info-card').setAttribute('visible', false);
+            // ボタンを隠す
+            document.querySelector('#exit-button').style.display = 'none';
+        }
+    </script>
 
-    <!-- 動物③ -->
-    <a-image src="catfish3.png" position="1 0 0" class="animal"></a-image>
+    <button id="exit-button" onclick="resetAR()" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; padding: 10px 20px; font-size: 18px; background: white; border-radius: 10px;">
+        もう一度探す
+    </button>
 
-    <!-- 説明カード -->
-    <a-plane id="infoCard"
-             position="0 1 0"
-             width="2"
-             height="1"
-             color="white"
-             visible="false">
-    </a-plane>
+    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" cursor="fuse: false; rayOrigin: mouse;">
+        
+        <a-assets>
+            <img id="cat1" src="catfish1.png">
+            <img id="cat2" src="catfish2.png">
+            <img id="cat3" src="catfish3.png">
+            <img id="card" src="catfish.png">
+        </a-assets>
 
-  </a-marker>
+        <a-marker type="pattern" url="pattern-marker.patt">
+            
+            <a-image src="#cat1" position="-1 0.5 0" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
+            
+            <a-image src="#cat2" position="0 0.5 -1" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
+            
+            <a-image src="#cat3" position="1 0.5 0" rotation="-90 0 0" scale="0.8 0.8 0.8" class="catfish clickable" tap-handler></a-image>
 
-  <a-entity camera></a-entity>
-</a-scene>
+            <a-image id="info-card" src="#card" position="0 1 0" rotation="-90 0 0" scale="2 2 2" visible="false"></a-image>
 
-<script>
-let tappedCount = 0;
-const animals = document.querySelectorAll('.animal');
-const card = document.getElementById('infoCard');
-const resetBtn = document.getElementById('resetBtn');
+        </a-marker>
 
-// タップ処理
-animals.forEach(animal => {
-  animal.addEventListener('click', () => {
-    if (animal.getAttribute('visible')) {
-      animal.setAttribute('visible', false);
-      tappedCount++;
-
-      if (tappedCount === 3) {
-        card.setAttribute('visible', true);
-        resetBtn.style.display = "block";
-      }
-    }
-  });
-});
-
-// リセット
-resetBtn.addEventListener('click', () => {
-  tappedCount = 0;
-
-  animals.forEach(animal => {
-    animal.setAttribute('visible', true);
-  });
-
-  card.setAttribute('visible', false);
-  resetBtn.style.display = "none";
-});
-</script>
-
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
 </html>
