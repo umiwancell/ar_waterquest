@@ -49,8 +49,11 @@
 </script>
 
 <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
-         cursor="fuse: false; rayOrigin: mouse;" 
          vr-mode-ui="enabled: false">
+    
+    <a-entity camera>
+        <a-entity cursor="fuse: false; rayOrigin: mouse;"
+                  raycaster="objects: .clickable"></a-entity>
     
     <a-assets>
         <img id="cat1" src="catfish1.png">
@@ -59,24 +62,26 @@
         <img id="card" src="catfish.png">
     </a-assets>
 
-    <a-marker preset="hiro">
-        <a-box class="clickable" fish-tap 
-               position="-1 0.5 0.5" rotation="0 0 0" scale="1 0.1 1"
-               src="#cat1" material="transparent: true; alphaTest: 0.5"></a-box>
-        
-        <a-box class="clickable" fish-tap 
-               position="0 0.5 -1" rotation="0 0 0" scale="1 0.1 1"
-               src="#cat2" material="transparent: true; alphaTest: 0.5"></a-box>
-        
-        <a-box class="clickable" fish-tap 
-               position="1 0.5 0.5" rotation="0 0 0" scale="1 0.1 1"
-               src="#cat3" material="transparent: true; alphaTest: 0.5"></a-box>
+   <a-marker preset="marker.patt">
+    <a-entity position="-1 0.5 0.5" rotation="0 0 0" class="clickable" fish-tap>
+        <a-image src="#cat1" scale="1 1 1"></a-image>
+        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
+    </a-entity>
 
-        <a-image id="info-card" src="#card" 
-                 position="0 1.2 0" rotation="-90 0 0" scale="2.8 2.0 1" 
-                 visible="false"></a-image>
+    <a-entity position="0 0.8 -1" rotation="0 0 0" class="clickable" fish-tap>
+        <a-image src="#cat2" scale="1 1 1"></a-image>
+        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
+    </a-entity>
 
-    </a-marker>
+    <a-entity position="1 0.5 0.5" rotation="0 0 0" class="clickable" fish-tap>
+        <a-image src="#cat3" scale="1 1 1"></a-image>
+        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
+    </a-entity>
+
+    <a-image id="info-card" src="#card" 
+             position="0 1.2 0" rotation="0 0 0" scale="2.8 2.0 1" 
+             visible="false"></a-image>
+</a-marker>
 
     <a-entity camera></a-entity>
 </a-scene>
