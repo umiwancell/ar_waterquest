@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>ナマズAR図鑑 - 最終安定版</title>
+    <title>ナマズAR図鑑 - 最終調整版</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-at-component.min.js"></script>
@@ -32,15 +32,16 @@
     <script>
         let tappedCount = 0;
 
-        // タップ検知コンポーネント（clickイベントに変更）
+        // タップ検知コンポーネント
         AFRAME.registerComponent('fish-catcher', {
             init: function () {
                 // 中心カーソル方式では 'click' が安定します
                 this.el.addEventListener('click', () => {
-                    if (this.el.getAttribute('visible') === false) return;
+                    const parentFish = this.el.parentNode; // 親のa-entity（魚）を取得
+                    if (parentFish.getAttribute('visible') === false) return;
 
                     // 魚を消す
-                    this.el.setAttribute('visible', false);
+                    parentFish.setAttribute('visible', false);
                     tappedCount++;
 
                     // ステータス更新
@@ -69,18 +70,24 @@
 
         <a-marker preset="marker.patt" emitevents="true">
             
-            <a-image id="fish1" src="#cat1" position="-1.5 0.8 0.5" scale="1.5 1.5 1"
-                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
+            <a-entity position="-1.5 0.8 0.5" look-at="#main-camera">
+                <a-image src="#cat1" scale="1.5 1.5 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-            <a-image id="fish2" src="#cat2" position="0 1.2 -1.5" scale="1.5 1.5 1"
-                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
+            <a-entity position="0 1.2 -1.5" look-at="#main-camera">
+                <a-image src="#cat2" scale="1.5 1.5 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-            <a-image id="fish3" src="#cat3" position="1.5 0.8 0.5" scale="1.5 1.5 1"
-                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
+            <a-entity position="1.2 0.5 0.5" look-at="#main-camera">
+                <a-image src="#cat3" scale="1.5 1.5 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-            <a-image id="info-card" src="#card" 
-                     position="0 2.0 0" scale="4.0 3.0 1" 
-                     visible="false" look-at="#main-camera"></a-image>
+            <a-entity id="info-card" position="0 2.0 0" look-at="#main-camera" visible="false">
+                <a-image src="#card" scale="4.0 3.0 1"></a-image>
+            </a-entity>
 
         </a-marker>
 
