@@ -2,9 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>ナマズAR図鑑 - 最終完成版</title>
+    <title>ナマズAR図鑑 - 最終安定版</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-at-component.min.js"></script>
     
     <style>
         /* 画面上のUIデザイン */
@@ -12,6 +13,7 @@
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px;
             border-radius: 25px; font-family: sans-serif; z-index: 1000; text-align: center;
+            font-size: 16px;
         }
         #exit-button {
             display: none; position: fixed; bottom: 40px; left: 50%;
@@ -24,22 +26,21 @@
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="status-display">ナマズを3匹見つけてタップしてね！</div>
+    <div id="status-display">画面中央の「〇」をナマズに合わせてタップしてね！</div>
     <button id="exit-button" onclick="location.reload()">もういちど探す</button>
 
     <script>
         let tappedCount = 0;
 
-        // タップ検知コンポーネント
+        // タップ検知コンポーネント（clickイベントに変更）
         AFRAME.registerComponent('fish-catcher', {
             init: function () {
-                // mousedownはスマホのタッチ開始に最も敏感に反応します
-                this.el.addEventListener('mousedown', () => {
-                    const parent = this.el.parentNode;
-                    if (parent.getAttribute('visible') === false) return;
+                // 中心カーソル方式では 'click' が安定します
+                this.el.addEventListener('click', () => {
+                    if (this.el.getAttribute('visible') === false) return;
 
                     // 魚を消す
-                    parent.setAttribute('visible', false);
+                    this.el.setAttribute('visible', false);
                     tappedCount++;
 
                     // ステータス更新
@@ -66,32 +67,30 @@
             <img id="card" src="catfish.png">
         </a-assets>
 
-        <a-marker preset="hiro" emitevents="true">
+        <a-marker preset="marker.patt" emitevents="true">
             
-            <a-entity position="-1.2 0.5 0.5" rotation="0 0 0">
-                <a-image src="#cat1" scale="1.2 1.2 1"></a-image>
-                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
-            </a-entity>
+            <a-image id="fish1" src="#cat1" position="-1.5 0.8 0.5" scale="1.5 1.5 1"
+                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
 
-            <a-entity position="0 0.8 -1.2" rotation="0 0 0">
-                <a-image src="#cat2" scale="1.2 1.2 1"></a-image>
-                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
-            </a-entity>
+            <a-image id="fish2" src="#cat2" position="0 1.2 -1.5" scale="1.5 1.5 1"
+                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
 
-            <a-entity position="1.2 0.5 0.5" rotation="0 0 0">
-                <a-image src="#cat3" scale="1.2 1.2 1"></a-image>
-                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
-            </a-entity>
+            <a-image id="fish3" src="#cat3" position="1.5 0.8 0.5" scale="1.5 1.5 1"
+                     class="clickable" fish-catcher look-at="#main-camera"></a-image>
 
             <a-image id="info-card" src="#card" 
-                     position="0 1.5 0" rotation="0 0 0" 
-                     scale="3.5 2.5 1" visible="false"></a-image>
+                     position="0 2.0 0" scale="4.0 3.0 1" 
+                     visible="false" look-at="#main-camera"></a-image>
 
         </a-marker>
 
-        <a-entity camera>
-            <a-entity cursor="fuse: false; rayOrigin: mouse;"
-                      raycaster="objects: .clickable; interval: 10;"></a-entity>
+        <a-entity camera id="main-camera">
+            <a-entity cursor="fuse: false; rayOrigin: entity;"
+                      raycaster="objects: .clickable; interval: 10;"
+                      position="0 0 -1"
+                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                      material="color: #ffde59; shader: flat; opacity: 0.8">
+            </a-entity>
         </a-entity>
 
     </a-scene>
