@@ -2,88 +2,99 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>ナマズAR図鑑 - 最終解決版</title>
+    <title>ナマズAR図鑑 - 最終完成版</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
     <style>
-        #exit-button {
-            display: none; position: fixed; bottom: 30px; left: 50%; 
-            transform: translateX(-50%); z-index: 999; padding: 15px 30px; 
-            font-size: 18px; background: #ffde59; border-radius: 50px; border: 2px solid #000;
+        /* 画面上のUIデザイン */
+        #status-display {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px;
+            border-radius: 25px; font-family: sans-serif; z-index: 1000; text-align: center;
         }
-        #status {
-            position: fixed; top: 10px; left: 10px; z-index: 1000; 
-            background: rgba(0,0,0,0.7); color: white; padding: 10px; font-size: 14px; border-radius: 5px;
+        #exit-button {
+            display: none; position: fixed; bottom: 40px; left: 50%;
+            transform: translateX(-50%); z-index: 1000; padding: 15px 40px;
+            font-size: 18px; font-weight: bold; background: #ffde59;
+            border: 3px solid #000; border-radius: 50px; cursor: pointer;
         }
     </style>
 </head>
+
 <body style="margin: 0; overflow: hidden;">
 
-<div id="status">ナマズを3匹見つけてタップしてね</div>
-<button id="exit-button" onclick="location.reload()">もういちど探す</button>
+    <div id="status-display">ナマズを3匹見つけてタップしてね！</div>
+    <button id="exit-button" onclick="location.reload()">もういちど探す</button>
 
-<script>
-    let tappedCount = 0;
+    <script>
+        let tappedCount = 0;
 
-    // タップ処理のコンポーネント
-    AFRAME.registerComponent('fish-tap', {
-        init: function () {
-            // mousedown (指が触れた瞬間) を使用
-            this.el.addEventListener('mousedown', () => {
-                if (this.el.getAttribute('visible') === false) return;
+        // タップ検知コンポーネント
+        AFRAME.registerComponent('fish-catcher', {
+            init: function () {
+                // mousedownはスマホのタッチ開始に最も敏感に反応します
+                this.el.addEventListener('mousedown', () => {
+                    const parent = this.el.parentNode;
+                    if (parent.getAttribute('visible') === false) return;
 
-                // 消去処理
-                this.el.setAttribute('visible', false);
-                tappedCount++;
-                
-                document.getElementById('status').innerText = `あと ${3 - tappedCount} 匹！`;
+                    // 魚を消す
+                    parent.setAttribute('visible', false);
+                    tappedCount++;
 
-                if (tappedCount === 3) {
-                    document.getElementById('status').innerText = "全部つかまえた！";
-                    document.querySelector('#info-card').setAttribute('visible', true);
-                    document.querySelector('#exit-button').style.display = 'block';
-                }
-            });
-        }
-    });
-</script>
+                    // ステータス更新
+                    const status = document.getElementById('status-display');
+                    if (tappedCount < 3) {
+                        status.innerText = `あと ${3 - tappedCount} 匹！`;
+                    } else {
+                        status.innerText = "コンプリート！解説を読んでね";
+                        document.querySelector('#info-card').setAttribute('visible', true);
+                        document.querySelector('#exit-button').style.display = 'block';
+                    }
+                });
+            }
+        });
+    </script>
 
-<a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
-         vr-mode-ui="enabled: false">
-    
-    <a-entity camera>
-        <a-entity cursor="fuse: false; rayOrigin: mouse;"
-                  raycaster="objects: .clickable"></a-entity>
-    
-    <a-assets>
-        <img id="cat1" src="catfish1.png">
-        <img id="cat2" src="catfish2.png">
-        <img id="cat3" src="catfish3.png">
-        <img id="card" src="catfish.png">
-    </a-assets>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
+             vr-mode-ui="enabled: false">
+        
+        <a-assets>
+            <img id="cat1" src="catfish1.png">
+            <img id="cat2" src="catfish2.png">
+            <img id="cat3" src="catfish3.png">
+            <img id="card" src="catfish.png">
+        </a-assets>
 
-   <a-marker preset="marker.patt">
-    <a-entity position="-1 0.5 0.5" rotation="0 0 0" class="clickable" fish-tap>
-        <a-image src="#cat1" scale="1 1 1"></a-image>
-        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
-    </a-entity>
+        <a-marker preset="hiro" emitevents="true">
+            
+            <a-entity position="-1.2 0.5 0.5" rotation="0 0 0">
+                <a-image src="#cat1" scale="1.2 1.2 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-    <a-entity position="0 0.8 -1" rotation="0 0 0" class="clickable" fish-tap>
-        <a-image src="#cat2" scale="1 1 1"></a-image>
-        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
-    </a-entity>
+            <a-entity position="0 0.8 -1.2" rotation="0 0 0">
+                <a-image src="#cat2" scale="1.2 1.2 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-    <a-entity position="1 0.5 0.5" rotation="0 0 0" class="clickable" fish-tap>
-        <a-image src="#cat3" scale="1 1 1"></a-image>
-        <a-box scale="1.2 1.2 0.2" material="opacity: 0; transparent: true"></a-box>
-    </a-entity>
+            <a-entity position="1.2 0.5 0.5" rotation="0 0 0">
+                <a-image src="#cat3" scale="1.2 1.2 1"></a-image>
+                <a-box scale="1.5 1.5 0.3" material="opacity: 0; transparent: true" class="clickable" fish-catcher></a-box>
+            </a-entity>
 
-    <a-image id="info-card" src="#card" 
-             position="0 1.2 0" rotation="0 0 0" scale="2.8 2.0 1" 
-             visible="false"></a-image>
-</a-marker>
+            <a-image id="info-card" src="#card" 
+                     position="0 1.5 0" rotation="0 0 0" 
+                     scale="3.5 2.5 1" visible="false"></a-image>
 
-    <a-entity camera></a-entity>
-</a-scene>
+        </a-marker>
+
+        <a-entity camera>
+            <a-entity cursor="fuse: false; rayOrigin: mouse;"
+                      raycaster="objects: .clickable; interval: 10;"></a-entity>
+        </a-entity>
+
+    </a-scene>
+
 </body>
 </html>
