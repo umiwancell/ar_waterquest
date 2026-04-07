@@ -2,108 +2,118 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>ナマズAR図鑑 - 最終調整版</title>
+    <title>タイの水生生物AR図鑑</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-at-component.min.js"></script>
-    
     <style>
-        /* 画面上のUIデザイン */
         #status-display {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px;
-            border-radius: 25px; font-family: sans-serif; z-index: 1000; text-align: center;
-            font-size: 16px;
+            border-radius: 25px; z-index: 1000; text-align: center; font-family: sans-serif;
         }
         #exit-button {
             display: none; position: fixed; bottom: 40px; left: 50%;
             transform: translateX(-50%); z-index: 1000; padding: 15px 40px;
-            font-size: 18px; font-weight: bold; background: #ffde59;
-            border: 3px solid #000; border-radius: 50px; cursor: pointer;
+            background: #ffde59; border: 3px solid #000; border-radius: 50px; font-weight: bold;
         }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="status-display">画面中央の「〇」をナマズに合わせてタップしてね！</div>
+    <div id="status-display">マーカーをさがしてね！</div>
     <button id="exit-button" onclick="location.reload()">もういちど探す</button>
 
     <script>
-        let tappedCount = 0;
+        // 各動物のタップ数を管理（2匹または3匹）
+        let counts = { umigame:0, kumanomi:0, jinbei:0, namazu:0, thirapia:0, tobihaze:0, kaeru:0 };
+        // クリアに必要な数
+        const targets = { umigame:3, kumanomi:3, jinbei:3, namazu:3, thirapia:3, tobihaze:3, kaeru:3 };
 
-        // タップ検知コンポーネント
-        AFRAME.registerComponent('fish-catcher', {
+        AFRAME.registerComponent('animal-catcher', {
+            schema: { type: {default: ''} },
             init: function () {
-                // 中心カーソル方式では 'click' が安定します
                 this.el.addEventListener('click', () => {
-                    const parentFish = this.el.parentNode; // 親のa-entity（魚）を取得
-                    if (parentFish.getAttribute('visible') === false) return;
+                    const parent = this.el.parentNode;
+                    if (parent.getAttribute('visible') === false) return;
 
-                    // 魚を消す
-                    parentFish.setAttribute('visible', false);
-                    tappedCount++;
+                    parent.setAttribute('visible', false);
+                    const id = this.data.type;
+                    counts[id]++;
+                    
+                    document.getElementById('status-display').innerText = `あと ${targets[id] - counts[id]} 匹！`;
 
-                    // ステータス更新
-                    const status = document.getElementById('status-display');
-                    if (tappedCount < 3) {
-                        status.innerText = `あと ${3 - tappedCount} 匹！`;
-                    } else {
-                        status.innerText = "コンプリート！解説を読んでね";
-                        document.querySelector('#info-card').setAttribute('visible', true);
+                    if (counts[id] === targets[id]) {
+                        document.querySelector(`#card-${id}`).setAttribute('visible', true);
                         document.querySelector('#exit-button').style.display = 'block';
+                        document.getElementById('status-display').innerText = "コンプリート！";
                     }
                 });
             }
         });
     </script>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
-             vr-mode-ui="enabled: false">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
         
         <a-assets>
-            <img id="cat1" src="catfish1.png">
-            <img id="cat2" src="catfish2.png">
-            <img id="cat3" src="catfish3.png">
-            <img id="card" src="catfish.png">
+            <img id="u1" src="umigame1.png"><img id="u2" src="umigame2.png"><img id="u3" src="umigame3.png"><img id="u-c" src="umigame.png">
+            <img id="k1" src="kumanomi1.png"><img id="k2" src="kumanomi2.png"><img id="k3" src="kumanomi3.png"><img id="k-c" src="kumanomi.png">
+            <img id="j1" src="jinbei1.png"><img id="j2" src="jinbei2.png"><img id="j3" src="jinbei3.png"><img id="j-c" src="jinbei.png">
+            <img id="n1" src="namazu1.png"><img id="n2" src="namazu2.png"><img id="n3" src="namazu3.png"><img id="n-c" src="namazu.png">
+            <img id="t1" src="thirapia1.png"><img id="t2" src="thirapia2.png"><img id="t3" src="thirapia3.png"><img id="t-c" src="thirapia.png">
+            <img id="h1" src="tobihaze1.png"><img id="h2" src="tobihaze2.png"><img id="h3" src="tobihaze3.png"><img id="h-c" src="tobihaze.png">
+            <img id="f1" src="kaeru1.png"><img id="f2" src="kaeru2.png"><img id="f3" src="kaeru3.png"><img id="f-c" src="kaeru.png">
         </a-assets>
 
-        <a-marker preset="marker.patt" emitevents="true">
-    
-    <a-entity position="-1 0.5 0.5">
-        <a-image src="#cat1" scale="1.2 1.2 1" rotation="-90 0 0"></a-image>
-        <a-box scale="1.5 1.5 0.2" material="opacity: 0; transparent: true" class="clickable" fish-catcher position="0 0 0" rotation="-90 0 0"></a-box>
-    </a-entity>
+        <a-marker type="pattern" url="umigame.patt">
+            <a-entity position="-0.8 0.5 0" rotation="-90 0 0"><a-image src="#u1"></a-image><a-box class="clickable" animal-catcher="type:umigame" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-entity position="0.8 0.5 0" rotation="-90 0 0"><a-image src="#u2"></a-image><a-box class="clickable" animal-catcher="type:umigame" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-image id="card-umigame" src="#u-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
 
-    <a-entity position="0 0.8 -1">
-        <a-image src="#cat2" scale="1.2 1.2 1" rotation="-90 0 0"></a-image>
-        <a-box scale="1.5 1.5 0.2" material="opacity: 0; transparent: true" class="clickable" fish-catcher position="0 0 0" rotation="-90 0 0"></a-box>
-    </a-entity>
+        <a-marker type="pattern" url="kumanomi.patt">
+            <a-entity position="-0.8 0.5 0" rotation="-90 0 0"><a-image src="#k1"></a-image><a-box class="clickable" animal-catcher="type:kumanomi" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-entity position="0.8 0.5 0" rotation="-90 0 0"><a-image src="#k2"></a-image><a-box class="clickable" animal-catcher="type:kumanomi" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-image id="card-kumanomi" src="#k-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
 
-    <a-entity position="1 0.5 0.5">
-        <a-image src="#cat3" scale="1.2 1.2 1" rotation="-90 0 0"></a-image>
-        <a-box scale="1.5 1.5 0.2" material="opacity: 0; transparent: true" class="clickable" fish-catcher position="0 0 0" rotation="-90 0 0"></a-box>
-    </a-entity>
+        <a-marker type="pattern" url="jinbei.patt">
+            <a-entity position="-1 0.5 0.5" rotation="-90 0 0"><a-image src="#j1" scale="1.5 1.5 1"></a-image><a-box class="clickable" animal-catcher="type:jinbei" material="opacity:0;transparent:true" scale="1.5 1.5 0.2"></a-box></a-entity>
+            <a-entity position="1 0.5 -0.5" rotation="-90 0 0"><a-image src="#j2" scale="1.5 1.5 1"></a-image><a-box class="clickable" animal-catcher="type:jinbei" material="opacity:0;transparent:true" scale="1.5 1.5 0.2"></a-box></a-entity>
+            <a-image id="card-jinbei" src="#j-c" position="0 1.5 0" rotation="-90 0 0" scale="4 3 1" visible="false"></a-image>
+        </a-marker>
 
-    <a-image id="info-card" src="#card" 
-             position="0 1.5 0" 
-             rotation="-90 0 0" 
-             scale="3.5 2.5 1" 
-             visible="false"></a-image>
+        <a-marker type="pattern" url="namazu.patt">
+            <a-entity position="-1 0.5 0.5" rotation="-90 0 0"><a-image src="#n1"></a-image><a-box class="clickable" animal-catcher="type:namazu" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-entity position="0 0.5 -1" rotation="-90 0 0"><a-image src="#n2"></a-image><a-box class="clickable" animal-catcher="type:namazu" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-entity position="1 0.5 0.5" rotation="-90 0 0"><a-image src="#n3"></a-image><a-box class="clickable" animal-catcher="type:namazu" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-image id="card-namazu" src="#n-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
 
-</a-marker>
+        <a-marker type="pattern" url="thirapia.patt">
+            <a-entity position="-0.8 0.5 0" rotation="-90 0 0"><a-image src="#t1"></a-image><a-box class="clickable" animal-catcher="type:thirapia" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-entity position="0.8 0.5 0" rotation="-90 0 0"><a-image src="#t2"></a-image><a-box class="clickable" animal-catcher="type:thirapia" material="opacity:0;transparent:true" scale="1.2 1.2 0.2"></a-box></a-entity>
+            <a-image id="card-thirapia" src="#t-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
 
-        
-        <a-entity camera id="main-camera">
-            <a-entity cursor="fuse: false; rayOrigin: entity;"
-                      raycaster="objects: .clickable; interval: 10;"
-                      position="0 0 -1"
-                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                      material="color: #ffde59; shader: flat; opacity: 0.8">
+        <a-marker type="pattern" url="tobihaze.patt">
+            <a-entity position="-0.7 0.5 0" rotation="-90 0 0"><a-image src="#h1" scale="0.8 0.8 1"></a-image><a-box class="clickable" animal-catcher="type:tobihaze" material="opacity:0;transparent:true" scale="1 1 0.2"></a-box></a-entity>
+            <a-entity position="0.7 0.5 0" rotation="-90 0 0"><a-image src="#h2" scale="0.8 0.8 1"></a-image><a-box class="clickable" animal-catcher="type:tobihaze" material="opacity:0;transparent:true" scale="1 1 0.2"></a-box></a-entity>
+            <a-image id="card-tobihaze" src="#h-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
+
+        <a-marker type="pattern" url="kaeru.patt">
+            <a-entity position="-1 0.5 0.5" rotation="-90 0 0"><a-image src="#f1" scale="0.9 0.9 1"></a-image><a-box class="clickable" animal-catcher="type:kaeru" material="opacity:0;transparent:true" scale="1.1 1.1 0.2"></a-box></a-entity>
+            <a-entity position="0 0.5 -1" rotation="-90 0 0"><a-image src="#f2" scale="0.9 0.9 1"></a-image><a-box class="clickable" animal-catcher="type:kaeru" material="opacity:0;transparent:true" scale="1.1 1.1 0.2"></a-box></a-entity>
+            <a-entity position="1 0.5 0.5" rotation="-90 0 0"><a-image src="#f3" scale="0.9 0.9 1"></a-image><a-box class="clickable" animal-catcher="type:kaeru" material="opacity:0;transparent:true" scale="1.1 1.1 0.2"></a-box></a-entity>
+            <a-image id="card-kaeru" src="#f-c" position="0 1.5 0" rotation="-90 0 0" scale="3.5 2.5 1" visible="false"></a-image>
+        </a-marker>
+
+        <a-entity camera>
+            <a-entity cursor="fuse: false; rayOrigin: entity;" raycaster="objects: .clickable;" position="0 0 -1"
+                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: #ffde59; shader: flat; opacity: 0.8">
             </a-entity>
         </a-entity>
-
     </a-scene>
-
 </body>
 </html>
