@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="th">
 <head>
     <meta charset="utf-8">
-    <title>タイの水生生物AR図鑑</title>
+    <title>คู่มือ AR เกี่ยวกับสัตว์น้ำของไทย</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -21,11 +21,11 @@
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="status-display">マーカーをさがしてね！</div>
-    <button id="exit-button" onclick="location.reload()">もういちど探す</button>
+    <div id="status-display">หาเครื่องหมายให้เจอ!</div>
+    <button id="exit-button" onclick="location.reload()">ค้นหาอีกครั้ง</button>
 
     <script>
-        // すべての動物で3匹（target: 3）に設定
+        // ตั้งค่าให้สัตว์ทุกชนิดมี 3 ตัว (target: 3)
         let counts = { umigame:0, kumanomi:0, jinbei:0, namazu:0, thirapia:0, tobihaze:0, kaeru:0 };
         const targetCount = 3;
 
@@ -40,14 +40,14 @@
                     const id = this.data.type;
                     counts[id]++;
                     
-                    document.getElementById('status-display').innerText = `あと ${targetCount - counts[id]} 匹！`;
+                    document.getElementById('status-display').innerText = `เหลืออีก ${targetCount - counts[id]} ตัว！`;
 
                     if (counts[id] === targetCount) {
-                        // カードを表示
+                        // การ์ดแสดงผล
                         const card = document.getElementById(`card-${id}`);
                         if(card) card.setAttribute('visible', true);
                         document.querySelector('#exit-button').style.display = 'block';
-                        document.getElementById('status-display').innerText = "コンプリート！";
+                        document.getElementById('status-display').innerText = "สมบูรณ์!";
                     }
                 });
             }
